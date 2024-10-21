@@ -184,6 +184,7 @@ export interface EditionConfig {
     showSubstitutionMarker: boolean;
     multiPageEngineForCriticalEdition: boolean;
     editionStructureSeparator: string;
+    exponentEnumerateBy: string | 'global';
 }
 
 export type EditionImagesSources = 'manifest' | 'graphics';

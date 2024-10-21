@@ -152,6 +152,7 @@ import { SynopsisXmlIdSelectorComponent } from './view-modes/synopsis/synopsis-x
 import { SynopsisEditionLevelSelectorComponent } from './view-modes/synopsis/synopsis-edition-level-selector/synopsis-edition-level-selector.component';
 import { NamedEntityOccurrencePagesListComponent } from './components/named-entity/named-entity-occurrence-pages-list/named-entity-occurrence-pages-list.component';
 import { DisplayFriendlyNamePipe } from './pipes/displayFriendlyName.pipe';
+import { ApparatusEntryExponentComponent } from './components/apparatus-entry/apparatus-entry-exponent/apparatus-entry-exponent.component';
 
 const routes: Routes = [
 ];
@@ -292,6 +293,7 @@ const DynamicComponents = [
     NamedEntityOccurrencePagesListComponent,
     DisplayFriendlyNamePipe,
     ...DynamicComponents,
+    ApparatusEntryExponentComponent,
   ],
   imports: [
     AppRoutingModule,

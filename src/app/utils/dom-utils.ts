@@ -248,8 +248,17 @@ export function deepSearch(obj, attrToMatch: string, valuesToMatch: string[], co
         results.push(obj);
       }
 
+      if (key === 'attributes') {
+        for (const attrKey in value) {
+          if (attrKey === attrToMatch && valuesToMatch.includes(value[attrKey])) {
+            results.push(obj);
+          }
+        }
+        continue;
+      }
+
       let excludedForType = false;
-      for (let i=0; i < loopAttributes.length; i++) {
+      for (let i = 0; i < loopAttributes.length; i++) {
         if (value instanceof loopAttributes[i]) {
           excludedForType = true;
           break;
@@ -270,3 +279,36 @@ export function deepSearch(obj, attrToMatch: string, valuesToMatch: string[], co
 
   return results;
 }
+
+/**
+ * Recursively filter items
+ * 
+ * @param content the array to filter
+ * @param filterExpression the expression that items must satisfy to be included in the result
+ * @returns the filtered array
+ */
+export function deepFilter(content: any[], filterExpression: (item: any) => boolean, parentId: string | null)
+  : { content: any[], filteredItems: { parentId: string, item: any }[] } {
+
+  const filteredItems: { parentId: string, item: any }[] = []
+
+  content = content.filter((item: any) => {
+    if (!filterExpression(item)) {
+      filteredItems.push({ parentId, item })
+      return false;
+    }
+
+    if (item.content) {
+      const result = deepFilter(item.content, filterExpression, item.attributes['id']);
+
+      item.content = result.content;
+      filteredItems.push(...result.filteredItems);
+    }
+
+    return true;
+  });
+
+  return { content, filteredItems };
+}
+
+

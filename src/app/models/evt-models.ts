@@ -34,10 +34,25 @@ export type OriginalEncodingNodeType = XMLElement;
 
 export interface EditionStructure {
     pages: Page[];
+    documentApparatusEntries?: DocumentApparatusEntries;
+}
+
+export class DocumentApparatusEntries {
+    apps: Map<string, PageApparatusEntries> = new Map();
+}
+
+export class PageApparatusEntries {
+    pageId: string;
+    apps: Map<string, ElementApparatusEntries> = new Map();
+}
+
+export class ElementApparatusEntries {
+    elementId: string;
+    apps: ApparatusEntry[] = [];
 }
 
 export type ViewModeId = 'imageOnly' | 'imageImage' | 'readingText' | 'imageText' | 'textText' |
-'collation' | 'textSources' | 'textVersions' | 'documentalMixed' | 'synopticEdition';
+    'collation' | 'textSources' | 'textVersions' | 'documentalMixed' | 'synopticEdition';
 
 export interface ViewMode {
     id: ViewModeId;
@@ -88,6 +103,30 @@ export interface NamedEntities {
 }
 
 export interface Attributes { [key: string]: string; }
+
+export class Attribute {
+    valueRef: string;
+    valueWithoutRef: string;
+
+    private constructor(value: string) {
+        this.valueWithoutRef = value.withoutSelectorCharacter();
+        this.valueRef = value.withSelectorCharacter();
+    }
+
+    equals(other: Attribute | string): boolean {
+        if (typeof other === 'string') {
+            return this.valueWithoutRef === other;
+        }
+        if (!(other instanceof Attribute)) {
+            return false;
+        }
+        return this.valueWithoutRef === other.valueWithoutRef;
+    }
+
+    static createOrDefault(value: string): Attribute | null {
+        return value ? new Attribute(value) : null;
+    }
+}
 
 export interface OriginalEncoding {
     originalEncoding: OriginalEncodingNodeType;
@@ -315,7 +354,7 @@ export class Surface extends GenericElement {
     };
 }
 
-export class Facsimile extends GenericElement{
+export class Facsimile extends GenericElement {
     corresp: string | undefined;
     surfaces: Surface[];
     surfaceGrps: SurfaceGrp[];
@@ -442,7 +481,7 @@ export class Addition extends GenericElement {
 
 export class Space extends GenericElement {
     quantity?: number;
-    unit?: 'chars' | 'letter' ;
+    unit?: 'chars' | 'letter';
 }
 
 export type SicType = 'crux'; // sic types supported in specific ways
@@ -1379,4 +1418,47 @@ export interface XMLImagesValues {
 export interface ViewerDataType {
     type: string;
     value: ViewerDataValue;
+}
+
+export class ApparatusEntryExponent extends GenericElement {
+    /**
+     * Avoid calling this directly, use the class factory methods
+     * cannot set type if private constructor
+     */
+    constructor(public label: string, public appEntries: ApparatusEntry[]) {
+        super();
+        this.type = ApparatusEntryExponent;
+    }
+
+    id(): Attribute {
+        return Attribute.createOrDefault(this.attributes['id']);
+    }
+    from(): Attribute {
+        return Attribute.createOrDefault(this.attributes['from']);
+    }
+    to(): Attribute {
+        return Attribute.createOrDefault(this.attributes['to']);
+    }
+
+    requiresParentAsFrom(): boolean {
+        return this.from() === null;
+    }
+
+    static create(id: string, from: string, to: string, label: string, appEntries: ApparatusEntry[]): ApparatusEntryExponent {
+        if (!this.isValidId(id))
+            throw new Error('id is required');
+
+        const anchor = new ApparatusEntryExponent(label, appEntries);
+        anchor.attributes = {
+            'name': 'apparatusEntryAnchor',
+            'id': id,
+            'from': from,
+            'to': to
+        };
+        return anchor;
+    }
+
+    private static isValidId(id: string) {
+        return id !== undefined && id !== null && id.length > 0;
+    }
 }
