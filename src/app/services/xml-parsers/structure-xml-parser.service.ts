@@ -154,7 +154,7 @@ export class StructureXmlParserService {
         const appTo = Attribute.createOrDefault(app.attributes[TO_ATTRIBUTE]);
         const isToAnchor = appTo && appTo.equals(anchorId);
         if (!isToAnchor) {
-          console.log("This anchor will be skipped because is the starting anchor, exponent will be place on the ending anchor", item);
+          //console.log("This anchor will be skipped because is the starting anchor, exponent will be place on the ending anchor", item);
           continue;
         }
 
@@ -164,7 +164,7 @@ export class StructureXmlParserService {
         items.splice(i + 1, 0, exponent);
       }
       else if (item.type?.name === 'ApparatusEntryExponent') {
-        console.log("The element is an exponent, skipping", item);
+        //console.log("The element is an exponent, skipping", item);
         continue;
       }
       else if (item.content) {
@@ -175,7 +175,7 @@ export class StructureXmlParserService {
         const itemId = item.attributes['id'];
         const app = this.getApparatusEntryOrDefault(itemId);
         if (!app) {
-          console.log("This item has no apparatus entry, skipping", item);
+          //console.log("This item has no apparatus entry, skipping", item);
           continue;
         }
 
