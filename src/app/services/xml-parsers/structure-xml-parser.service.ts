@@ -198,7 +198,7 @@ export class StructureXmlParserService {
         }
       }
       else {
-        console.log('Node is not of interest for apparatus processing', item);
+        //console.log('Node is not of interest for apparatus processing', item);
       }
     }
   }
