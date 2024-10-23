@@ -171,6 +171,6 @@
   },
   "defaultImageZoomLevel": 0.8,
   "multiPageEngineForCriticalEdition": false,
-  "editionStructureSeparator": "pb, div[type='chapter']",
+  "editionStructureSeparator": "pb, div[type='paragraph']",
   "exponentEnumerateBy": "div[type='paragraph']"
 }
