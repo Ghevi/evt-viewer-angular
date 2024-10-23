@@ -1,10 +1,6 @@
 <ng-container *ngIf="this.data.appEntries.length">
-    <button type="button" class="btn btn-link popover-toggle evt-trigger" (click)="this.shown = !this.shown"
-        (mouseenter)="this.onHover(true)" (mouseleave)="this.onHover(false)">
-        <span class="note-icon">
-            {{ this.data.label }}
-        </span>
-    </button>
+    <evt-note-button [exponent]="this.data.label" [noteType]="this.noteType" (click)="this.shown = !this.shown"
+        (mouseenter)="this.onHover(true)" (mouseleave)="this.onHover(false)"></evt-note-button>
 
     <ng-container *ngIf="this.shown">
         <evt-apparatus-entry-detail *ngFor="let app of this.data.appEntries"

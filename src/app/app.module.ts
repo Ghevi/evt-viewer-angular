@@ -153,6 +153,7 @@ import { SynopsisEditionLevelSelectorComponent } from './view-modes/synopsis/syn
 import { NamedEntityOccurrencePagesListComponent } from './components/named-entity/named-entity-occurrence-pages-list/named-entity-occurrence-pages-list.component';
 import { DisplayFriendlyNamePipe } from './pipes/displayFriendlyName.pipe';
 import { ApparatusEntryExponentComponent } from './components/apparatus-entry/apparatus-entry-exponent/apparatus-entry-exponent.component';
+import { NoteButtonComponent } from './components/note-button/note-button.component';
 
 const routes: Routes = [
 ];
@@ -294,6 +295,7 @@ const DynamicComponents = [
     DisplayFriendlyNamePipe,
     ...DynamicComponents,
     ApparatusEntryExponentComponent,
+    NoteButtonComponent,
   ],
   imports: [
     AppRoutingModule,

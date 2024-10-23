@@ -12,6 +12,7 @@ import { ApparatusEntryExponentService } from './apparatus-entry-exponent.servic
 export class ApparatusEntryExponentComponent {
   @Input() data: ApparatusEntryExponent;
   shown: boolean;
+  noteType: string = 'critical'; // Temp, it's probably correct but needs confirmation
 
   constructor(
     private exponentService: ApparatusEntryExponentService
@@ -40,7 +41,7 @@ export class ApparatusEntryExponentComponent {
       for (let evtText of allEvtTexts) {
         evtText = evtText as HTMLElement;
         const isChildOfAppDetails = evtText.closest('evt-apparatus-entry-detail');
-        if(isChildOfAppDetails) continue;
+        if (isChildOfAppDetails) continue;
 
         const isAfterFrom = fromEl.compareDocumentPosition(evtText) & Node.DOCUMENT_POSITION_FOLLOWING;
         const isBeforeTo = evtText.compareDocumentPosition(toEl) & Node.DOCUMENT_POSITION_FOLLOWING;
