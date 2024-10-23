@@ -110,8 +110,9 @@ export class StructureXmlParserService {
   }
 
   /**
-   * This function adds the apparatus exponents based on many different cases
-   * for inline and standoff apparatuses.
+   * This function adds the apparatus exponents on the parsed content of the body
+   * based on many different cases for inline and standoff apparatuses.
+   * So these exponents are added inline
    * 
    * @param items the items to be processed
    * @param onApparatusEntryReplaced callback for adding apparatus entries
@@ -135,7 +136,12 @@ export class StructureXmlParserService {
         const from = null; // it should be the parent element but such parent might have no xml:id. 
         const to = id; // to itself as the end element
         const exponent = ApparatusEntryExponent.create(id, from, to, getExponentLabel(), [app]);
-        items[i] = exponent;
+        if (app.lemma) { // the inline apparatus has a lemma so it must be rendeder 
+          items[i] = app.lemma;
+          items.splice(i + 1, 0, exponent);
+        } else { // the inline apparatus has no lemma so we just replace the app with the exponent
+          items[i] = exponent; 
+        }
         onApparatusEntryReplaced(item, exponent);
       }
       else if (item.type?.name === 'Anchor') {
@@ -163,6 +169,7 @@ export class StructureXmlParserService {
         // insert at index
         items.splice(i + 1, 0, exponent);
       }
+      // in other cases exponents are added to the items array, so we skip them
       else if (item.type?.name === 'ApparatusEntryExponent') {
         //console.log("The element is an exponent, skipping", item);
         continue;
@@ -188,7 +195,6 @@ export class StructureXmlParserService {
           const to = exponentId; // the exponent will be the To element itself since is placed as next sibling of the current item
           const exponent = ApparatusEntryExponent.create(exponentId, from, to, getExponentLabel(), [app]);
           items.splice(i + 1, 0, exponent); // insert as sibling because this component is not an anchor
-          i++; // skipping the exponent that has just been added saves one loop
         }
         else if (!appTo) {
           const from = itemId; // from itself since the apparatus entry refer to it
