@@ -8,21 +8,23 @@ import { ParserRegister } from '.';
 import { getFromAttributeOrDefault, getToAttributeOrDefault } from 'src/app/extensions/apparatus.extensions';
 import { FROM_ATTRIBUTE, TO_ATTRIBUTE } from 'src/app/models/constants';
 import { v4 as uuidv4 } from 'uuid';
+import { AlphabetService } from '../alphabet.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class StructureXmlParserService {
   constructor(
-    private genericParserService: GenericParserService) {
+    private genericParserService: GenericParserService,
+    private alphabet: AlphabetService) {
   }
 
   private frontOrigContentAttr = 'document_front';
-  readonly frontTagName = 'front';
-  readonly pageTagName = AppConfig.evtSettings.edition.editionStructureSeparator;
-  readonly bodyTagName = 'body';
-  readonly backTagName = 'back';
-  public backApps: XMLElement[] = [];
+  private readonly frontTagName = 'front';
+  private readonly pageTagName = AppConfig.evtSettings.edition.editionStructureSeparator;
+  private readonly bodyTagName = 'body';
+  private readonly backTagName = 'back';
+  private backApps: XMLElement[] = [];
 
   private readonly appParser = ParserRegister.get('evt-apparatus-entry-parser');
 
@@ -54,8 +56,13 @@ export class StructureXmlParserService {
       : bodyPbs.map((pb, idx, arr) => this.parseDocumentPage(doc, pb as HTMLElement, arr[idx + 1] as HTMLElement, this.bodyTagName));
 
     editionStructure.pages.push(...frontPages, ...bodyPages);
-
+    
     this.backApps = back && Array.from(back.querySelectorAll("app"));
+    this.processCriticalApparatus(el, editionStructure);
+    return editionStructure;
+  }
+
+  private processCriticalApparatus(el: XMLElement, editionStructure: EditionStructure): void {
     if (this.backApps) {
       const result = this.getDocumentApparatusEntries(editionStructure.pages);
       result.apps.forEach((value, key) => {
@@ -77,45 +84,50 @@ export class StructureXmlParserService {
       const page = editionStructure.pages[i];
       this.addApparatusExponents(
         page.parsedContent,
-        (app, exponent) => {
-          const exponentId = exponent.id().valueWithoutRef;
-          const pageAppEntries = editionStructure.documentApparatusEntries.apps.get(page.id);
-          const elementAppEntries = pageAppEntries.apps.get(exponentId);
-          if (elementAppEntries) {
-            elementAppEntries.apps.push(app);
-          }
-          else {
-            const elementAppEntries: ElementApparatusEntries = {
-              elementId: exponentId,
-              apps: [app]
-            };
-            pageAppEntries.apps.set(exponentId, elementAppEntries);
-          }
-        },
-        () => {
-          counter++;
-          return counter.toString();
-        },
-        (item: GenericElement) => {
-          const currentItemJson = JSON.stringify(item);
-          const matchesSelector = enumeratedByJsonElements.some(x => x === currentItemJson);
-          if (enumerateBy !== 'global' && matchesSelector) {
-            counter = 0;
-          }
-        }
+        (app, exponent) => onApparatusEntryReplaced(page, app, exponent),
+        () => exponentLabelFactory(this.alphabet),
+        onShouldResetCounter,
       )
     }
+    
+    function onApparatusEntryReplaced(page: Page, app: ApparatusEntry, exponent: ApparatusEntryExponent): void {
+      const exponentId = exponent.id().valueWithoutRef;
+      const pageAppEntries = editionStructure.documentApparatusEntries.apps.get(page.id);
+      const elementAppEntries = pageAppEntries.apps.get(exponentId);
+      if (elementAppEntries) {
+        elementAppEntries.apps.push(app);
+      }
+      else {
+        const elementAppEntries: ElementApparatusEntries = {
+          elementId: exponentId,
+          apps: [app]
+        };
+        pageAppEntries.apps.set(exponentId, elementAppEntries);
+      }
+    }
 
-    return editionStructure;
+    function exponentLabelFactory(alphabet: AlphabetService): string {
+      const label = alphabet.createBase26Label(counter);
+      counter++;
+      return label;
+    }
+
+    function onShouldResetCounter(item: GenericElement): void {
+      const currentItemJson = JSON.stringify(item);
+      const matchesSelector = enumeratedByJsonElements.some(x => x === currentItemJson);
+      if (enumerateBy !== 'global' && matchesSelector) {
+        counter = 0;
+      }
+    }
   }
 
   /**
    * This function adds the apparatus exponents on the parsed content of the body
    * based on many different cases for inline and standoff apparatuses.
-   * So these exponents are added inline
+   * So these exponents are added inline.
    * 
-   * @param items the items to be processed
-   * @param onApparatusEntryReplaced callback for adding apparatus entries
+   * @param items the items to be processed.
+   * @param onApparatusEntryReplaced callback for adding apparatus entries.
    */
   addApparatusExponents(
     items: any[],
@@ -140,7 +152,7 @@ export class StructureXmlParserService {
           items[i] = app.lemma;
           items.splice(i + 1, 0, exponent);
         } else { // the inline apparatus has no lemma so we just replace the app with the exponent
-          items[i] = exponent; 
+          items[i] = exponent;
         }
         onApparatusEntryReplaced(item, exponent);
       }
