@@ -164,6 +164,9 @@ import { LabelComponent } from './components/label/label.component';
 import { LacunaComponent } from './components/lacuna/lacuna.component';
 import { PageLacunaComponent } from './panels/witness-panel/page-lacuna/page-lacuna.component';
 import { WitnessRespMetadataComponent } from './components/witness-metadata/witness-resp-metadata/witness-resp-metadata.component';
+import { ListTransposeComponent } from './components/list-transpose/list-transpose.component';
+import { TransposeComponent } from './components/list-transpose/transpose/transpose.component';
+import { PtrComponent } from './components/list-transpose/transpose/ptr/ptr.component';
 
 const routes: Routes = [
 ];
@@ -316,6 +319,9 @@ const DynamicComponents = [
     LabelComponent,
     PageLacunaComponent,
     WitnessRespMetadataComponent,
+    ListTransposeComponent,
+    TransposeComponent,
+    PtrComponent,
   ],
   imports: [
     AppRoutingModule,

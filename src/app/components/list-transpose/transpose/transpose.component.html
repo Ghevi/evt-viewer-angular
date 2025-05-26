@@ -1,0 +1,4 @@
+<span *ngFor="let ptr of data.content; let isLast = last">
+    <evt-ptr [data]="ptr"></evt-ptr>
+    <span *ngIf="!isLast">&nbsp;</span>
+</span>
