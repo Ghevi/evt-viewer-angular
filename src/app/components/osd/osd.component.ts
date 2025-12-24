@@ -11,6 +11,9 @@ import { OsdTileSource, ViewerDataInput, ViewerSource } from '../../models/evt-p
 import { uuid } from '../../utils/js-utils';
 import { EvtLinesHighlightService } from 'src/app/services/evt-lines-highlight.service';
 import { EVTModelService } from '../../services/evt-model.service';
+import { Viewer } from "openseadragon";
+import { OpenSeaDragonOverlay } from './osd';
+import { ShapesOverlay } from './osd-overlay';
 
 // eslint-disable-next-line no-var
 declare var OpenSeadragon;
@@ -36,23 +39,6 @@ interface OsdAnnotationAPI {
   removeElementById: (id: string) => void;
   removeElementsById: (ids: string[]) => void;
   goToElementLocation: (id: string) => void;
-}
-
-interface OsdViewerAPI {
-  addHandler: (eventName: string, handler: (x: { page?: number, position: {} }) => void) => void;
-  goToPage: (page: number) => void;
-  viewport;
-  gestureSettingsMouse;
-  container;
-  raiseEvent: (evtName: string) => void;
-  forceRedraw: () => void;
-  destroy: () => void;
-  canvasOverlay: ({ }) => OpenSeaDragonOverlay;
-}
-
-interface OpenSeaDragonOverlay {
-  canvas: () => HTMLCanvasElement;
-  context2d: () => CanvasRenderingContext2D;
 }
 
 @Component({
@@ -108,7 +94,7 @@ export class OsdComponent implements AfterViewInit, OnDestroy {
 
   @Input() text: string;
 
-  viewer: Partial<OsdViewerAPI>;
+  viewer: Viewer;
   viewerId: string;
   overlay: OpenSeaDragonOverlay;
   annotationsHandle: OsdAnnotationAPI;
@@ -253,14 +239,24 @@ export class OsdComponent implements AfterViewInit, OnDestroy {
         this.viewer.addHandler('open', () => {
           const tracker = new OpenSeadragon.MouseTracker({
             element: this.viewer.container,
-            moveHandler: (event) => {
-              const webPoint = event.position;
+            moveHandler: (event: any) => {
+              const webPoint = event.position as OpenSeadragon.Point;
               const viewportPoint = this.viewer.viewport.pointFromPixel(webPoint);
               const imagePoint = this.viewer.viewport.viewportToImageCoordinates(viewportPoint);
               this.mouseMoved$.next({ x: imagePoint.x, y: imagePoint.y });
             },
           });
           tracker.setTracking(true);
+
+          const shapes = new ShapesOverlay(this.viewer);
+          this.surface.zones.lines.forEach(hs => {
+            const p = shapes.addPolygon(
+              "p1",
+              hs.coords.map(p => { return { x: p.x, y: p.y } }),
+              { fill: "rgba(255,255,0,0.3)", stroke: "orange" }
+            );
+            shapes.onShapeClick(p, (shape, e) => console.log("Shape clicked", shape, e));
+          });
         });
 
         if (this.surface?.zones?.lines?.length > 0) {
