@@ -1,5 +1,5 @@
 import { AppConfig } from 'src/app/app.config';
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, OnDestroy, Output, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, OnDestroy, Output, TemplateRef, ViewChild } from '@angular/core';
 
 import { HttpClient } from '@angular/common/http';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -14,6 +14,7 @@ import { EVTModelService } from '../../services/evt-model.service';
 import { Viewer } from "openseadragon";
 import { OpenSeaDragonOverlay } from './osd';
 import { ShapesOverlay } from './osd-shapes-overlay';
+import { ModalService } from 'src/app/ui-components/modal/modal.service';
 
 // eslint-disable-next-line no-var
 declare var OpenSeadragon;
@@ -115,9 +116,13 @@ export class OsdComponent implements AfterViewInit, OnDestroy {
   mouseMoved$ = new Subject<{ x: number; y: number; }>();
   mouseClicked$ = new Subject<{ x: number; y: number; }>();
 
+  @ViewChild('hotspotModalTemplate', { static: true }) hotspotModalTemplate!: TemplateRef<any>;
+  // private hotspotModalRef: NgbModalRef = null;
+
   constructor(
     private http: HttpClient, private linesHighlightService: EvtLinesHighlightService,
     private evtModelService: EVTModelService,
+    private modalService: ModalService
   ) {
     this.subscriptions.push(
       this.pageChange.pipe(
@@ -249,13 +254,17 @@ export class OsdComponent implements AfterViewInit, OnDestroy {
           tracker.setTracking(true);
 
           const shapes = new ShapesOverlay(this.viewer);
-          this.surface.zones.lines.forEach(hs => {
+          this.surface.zones.hotspots.forEach(hs => {
             const p = shapes.addPolygon(
-              "p1",
+              hs.id,
               hs.coords.map(p => { return { x: p.x, y: p.y } }),
-              { fill: "rgba(255,255,0,0.3)", stroke: "orange" }
+              { id: hs.id },
+              { fill: "rgba(255,255,0,0.3)", stroke: "orange" },
             );
-            shapes.onShapeClick(p, (shape, e) => console.log("Shape clicked", shape, e));
+            shapes.onShapeClick(p, (shape, e) => {
+              console.log("Shape clicked", shape, e);
+              _ = this.modalService.open(this.hotspotModalTemplate, { ariaLabelledBy: 'modal-basic-title'});
+            });
           });
         });
 

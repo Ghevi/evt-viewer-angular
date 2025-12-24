@@ -2,3 +2,13 @@
     #osd
     class="full-height" [class.hideToolbar]="options?.showNavigationControl === false">
 </div>
+
+<ng-template #hotspotModalTemplate let-modal>
+    <div class="modal-header">
+        <h4 class="modal-title" id="modal-basic-title">{{ "HotSpot" }}</h4>
+        <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click');"></button>
+    </div>
+    <div class="modal-body overflow-auto" style="max-height: 80vh;">
+        HotSpot modal works!
+    </div>
+</ng-template>

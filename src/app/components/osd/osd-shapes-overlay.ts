@@ -24,6 +24,7 @@ export interface ShapeBase {
     id: string;
     type: ShapeType;
     node: SVGElement;
+    userData: {};
     onClick?: (shape: ShapeBase, evt: MouseEvent) => void;
 }
 
@@ -40,13 +41,14 @@ export class ShapesOverlay {
         this.viewer.addHandler("viewport-change", () => this.update());
     }
 
-    addRect(id: string, rect: ImageRect, options: ShapeOptions = {}): ShapeBase {
+    addRect(id: string, rect: ImageRect, userData: {}, options: ShapeOptions = {}): ShapeBase {
         const node = this.createNode("rect", options);
         const shape: ShapeBase & { rect: ImageRect } = {
             id,
             type: "rect",
             rect,
-            node
+            node,
+            userData
         };
 
         this.bindClick(shape);
@@ -57,13 +59,14 @@ export class ShapesOverlay {
         return shape;
     }
 
-    addPolygon(id: string, points: ImagePoint[], options: ShapeOptions = {}): ShapeBase {
+    addPolygon(id: string, points: ImagePoint[], userData: {}, options: ShapeOptions = {}): ShapeBase {
         const node = this.createNode("polygon", options);
         const shape: ShapeBase & { points: ImagePoint[] } = {
             id,
             type: "polygon",
             points,
-            node
+            node,
+            userData
         };
 
         this.bindClick(shape);
