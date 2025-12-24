@@ -1,4 +1,4 @@
-import { ShapesOverlay } from "./osd-overlay";
+import { ShapesOverlay } from "./osd-shapes-overlay";
 
 export interface OpenSeaDragonOverlay {
   canvas: () => HTMLCanvasElement;

@@ -13,7 +13,7 @@ import { EvtLinesHighlightService } from 'src/app/services/evt-lines-highlight.s
 import { EVTModelService } from '../../services/evt-model.service';
 import { Viewer } from "openseadragon";
 import { OpenSeaDragonOverlay } from './osd';
-import { ShapesOverlay } from './osd-overlay';
+import { ShapesOverlay } from './osd-shapes-overlay';
 
 // eslint-disable-next-line no-var
 declare var OpenSeadragon;
