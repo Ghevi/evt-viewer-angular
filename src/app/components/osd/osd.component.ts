@@ -253,19 +253,21 @@ export class OsdComponent implements AfterViewInit, OnDestroy {
           });
           tracker.setTracking(true);
 
-          const shapes = new ShapesOverlay(this.viewer);
-          this.surface.zones.hotspots.forEach(hs => {
-            const p = shapes.addPolygon(
-              hs.id,
-              hs.coords.map(p => { return { x: p.x, y: p.y } }),
-              { id: hs.id },
-              { fill: "rgba(255,255,0,0.3)", stroke: "orange" },
-            );
-            shapes.onShapeClick(p, (shape, e) => {
-              console.log("Shape clicked", shape, e);
-              _ = this.modalService.open(this.hotspotModalTemplate, { ariaLabelledBy: 'modal-basic-title'});
+          if (this.surface?.zones.hotspots.length > 0) {
+            const shapes = new ShapesOverlay(this.viewer);
+            this.surface.zones.hotspots.forEach(hs => {
+              const p = shapes.addPolygon(
+                hs.id,
+                hs.coords.map(p => { return { x: p.x, y: p.y } }),
+                { id: hs.id },
+                { fill: "rgba(255,255,0,0.3)", stroke: "orange" },
+              );
+              shapes.onShapeClick(p, (shape, e) => {
+                console.log("Shape clicked", shape, e);
+                _ = this.modalService.open(this.hotspotModalTemplate, { ariaLabelledBy: 'modal-basic-title' });
+              });
             });
-          });
+          }
         });
 
         if (this.surface?.zones?.lines?.length > 0) {
