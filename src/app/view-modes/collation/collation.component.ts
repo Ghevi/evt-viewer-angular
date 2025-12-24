@@ -7,7 +7,6 @@ import { Witness } from 'src/app/models/evt-models';
 import { EVTModelService } from 'src/app/services/evt-model.service';
 import { EVTStatusService } from 'src/app/services/evt-status.service';
 import { EvtIconInfo } from 'src/app/ui-components/icon/icon.component';
-import { ModalComponent } from 'src/app/ui-components/modal/modal.component';
 import { ModalService } from 'src/app/ui-components/modal/modal.service';
 import { ModalWitnessItem } from './modal-witness-item/modal-witness-item.component';
 
@@ -18,7 +17,6 @@ import { ModalWitnessItem } from './modal-witness-item/modal-witness-item.compon
 })
 export class CollationComponent implements OnDestroy {
   @ViewChild('collationPanel', { static: false }) collationPanel: ElementRef;
-  @ViewChild('witnessesModal', { static: false }) witnessesModal: ModalComponent;
   private witnessModalRef: NgbModalRef = null;
   searchWitness = '';
   updateSearchTerm$ = new BehaviorSubject<string>('');
